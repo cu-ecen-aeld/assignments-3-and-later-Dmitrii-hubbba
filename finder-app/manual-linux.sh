@@ -129,8 +129,11 @@ sudo mknod -m 600 dev/console c 5 1
 echo "Node 2"
 
 # TODO: Clean and build the writer utility
-cp /usr/local/share/assignment-2-Dmitrii-hubbba/writer ${OUTDIR}/rootfs/home
-cp /usr/local/share/assignment-2-Dmitrii-hubbba/finder-app/finder.sh ${OUTDIR}/rootfs/home
+cd "$FINDER_APP_DIR"
+make clean
+make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE
+cp writer ${OUTDIR}/rootfs/home
+cp finder.sh ${OUTDIR}/rootfs/home
 echo "Copied writer utility"
 
 # TODO: Copy the finder related scripts and executables to the /home directory
