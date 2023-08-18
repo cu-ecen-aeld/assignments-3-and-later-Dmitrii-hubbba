@@ -1,6 +1,6 @@
 CC=/usr/local/armgcc/10.2/bin/aarch64-none-linux-gnu-gcc
 
-writer: writer.c
+all: writer.c
 ifeq ($(CROSS_COMPILE), aarch64-none-linux-gnu-)
 	#CC = aarch64-none-linux-gnu-gcc
 	#OBJCOPY = aarch64-none-linux-gnu-objcopy
