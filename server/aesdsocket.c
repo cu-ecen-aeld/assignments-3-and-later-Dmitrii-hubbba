@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <syslog.h>
@@ -19,9 +20,9 @@ struct sockaddr_storage client_address;
 struct addrinfo hints;
 struct addrinfo *servinfo;
 
-const size_t BUFF_SIZE = 100;
-char buffer[100];
-char string_to_write[100];
+const size_t BUFF_SIZE = 10000;
+char buffer[10000];
+char string_to_write[10000];
 
 openlog(NULL, LOG_CONS, LOG_USER);
 //COMMENT
@@ -51,6 +52,15 @@ int bytes_received = 0;
 //FILE *fd = fopen("/var/tmp/aesdsocketdata","a+");
 FILE *fd = fopen("aesdsocketdata.txt", "a+");
 
+//int bytes_read;
+int size = 10;
+char *string;
+//printf ("Please enter a string: ");
+/* These 2 lines are very important. */
+string = (char *) malloc (size);
+int amount_to_send = 0;
+//bytes_read = getline (&string, &size, stdin);
+
 while(1) {
 
 connection_fd = accept(socket_fd, (struct sockaddr *)&client_address, &addr_size);//ADD check return value
@@ -66,8 +76,8 @@ while(1) {
 
   memset(buffer, 0, sizeof buffer);
   memset(string_to_write, 0, sizeof string_to_write);
+
   bytes_received = recv(connection_fd, buffer, BUFF_SIZE - 1, 0);
-  printf("Received %d bytes\n", bytes_received);
 
   if (bytes_received == 0) break;
 
@@ -75,18 +85,18 @@ while(1) {
     if (buffer[i] == '\n') {
       memcpy(string_to_write, buffer, 100);
       fprintf(fd, "%s", string_to_write);
-      //printf("%s\n", string_to_write);
-     // fflush(fd);
     }
   }
 
   fflush(fd);
 
-  fscanf(fd, "%s", string_to_write);
-  printf("Read string %s\n", string_to_write);
-  send(connection_fd, string_to_write, 100, 0);
-  //printf("Sent %d bytes.\n", bytes_sent);
 
+  rewind(fd);
+  memset(string, 0, sizeof string);
+  while((amount_to_send = getline(&string, (size_t * restrict)&size, fd)) != -1)  {
+    printf("Read string %s\n", string);
+    send(connection_fd, string, amount_to_send, 0);
+  }
 }
 
 //fflush(fd);
